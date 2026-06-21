@@ -420,21 +420,39 @@ function Home() {
             in der Mittelriedstraße 27 in Bürstadt.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mt-12">
-            <a
-              href={CONTACT.maps.search}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 border border-[rgba(255,255,255,0.2)] px-8 py-4 text-xs tracking-[0.25em] uppercase hover:border-gold hover:text-gold transition-all"
-            >
-              <MapPin className="h-4 w-4" /> Google Maps öffnen
-            </a>
+          <div className="flex justify-center mt-12">
             <button
               onClick={() => setReserveOpen(true)}
               className="bg-gold text-black px-8 py-4 text-xs tracking-[0.25em] uppercase hover:bg-[var(--gold-soft)] transition-all"
             >
               Jetzt reservieren
             </button>
+          </div>
+
+          <div className="mt-16 max-w-4xl mx-auto w-full space-y-4 text-left">
+            <div className="overflow-hidden border border-[rgba(201,169,97,0.2)]">
+              <iframe
+                title="Tiger Lounge auf Google Maps"
+                src={CONTACT.maps.embed}
+                className="w-full h-64 md:h-80 border-0 grayscale-[20%] contrast-[1.05]"
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                allowFullScreen
+              />
+            </div>
+            <p className="text-center text-xs tracking-[0.2em] uppercase text-muted-foreground">
+              <MapPin className="inline h-3.5 w-3.5 mr-1 -mt-0.5" />
+              {CONTACT.address.label}
+            </p>
+            <a
+              href={CONTACT.maps.directions}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 w-full bg-gold text-black py-4 text-xs tracking-[0.25em] uppercase hover:bg-[var(--gold-soft)] transition-all"
+            >
+              <Navigation className="h-4 w-4" />
+              Route in Google Maps
+            </a>
           </div>
 
           <button
@@ -692,7 +710,7 @@ function ReserveField({ id, label, children }: { id: string; label: string; chil
 function ImprintModal({ open, onOpenChange }: { open: boolean; onOpenChange: (b: boolean) => void }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-black border border-[rgba(201,169,97,0.3)] sm:max-w-lg p-8 max-h-[90vh] overflow-y-auto">
+      <DialogContent className="bg-black border border-[rgba(201,169,97,0.3)] sm:max-w-md p-10">
         <DialogHeader>
           <div className="text-gold text-[10px] tracking-[0.5em] uppercase mb-3 text-center">Information</div>
           <DialogTitle className="font-display text-3xl text-center tracking-wide">Impressum</DialogTitle>
@@ -704,28 +722,6 @@ function ImprintModal({ open, onOpenChange }: { open: boolean; onOpenChange: (b:
             <br />
             {CONTACT.address.zip} {CONTACT.address.city}
           </p>
-
-          <div className="space-y-3 text-left">
-            <div className="overflow-hidden border border-[rgba(201,169,97,0.2)]">
-              <iframe
-                title="Tiger Lounge auf Google Maps"
-                src={CONTACT.maps.embed}
-                className="w-full h-52 border-0 grayscale-[20%] contrast-[1.05]"
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                allowFullScreen
-              />
-            </div>
-            <a
-              href={CONTACT.maps.directions}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 w-full bg-gold text-black py-4 text-xs tracking-[0.25em] uppercase hover:bg-[var(--gold-soft)] transition-all"
-            >
-              <Navigation className="h-4 w-4" />
-              Route in Google Maps
-            </a>
-          </div>
 
           <p className="text-foreground/85 leading-relaxed">
             <a href={CONTACT.phoneTel} className="hover:text-gold transition-colors">
