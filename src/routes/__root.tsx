@@ -14,19 +14,19 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 
 function NotFoundComponent() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+    <div className="flex min-h-screen items-center justify-center bg-black px-4">
       <div className="max-w-md text-center">
-        <h1 className="text-7xl font-bold text-foreground">404</h1>
-        <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
+        <h1 className="font-display text-7xl text-foreground">404</h1>
+        <h2 className="mt-4 text-xl font-semibold text-foreground">Seite nicht gefunden</h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          The page you're looking for doesn't exist or has been moved.
+          Die angeforderte Seite existiert nicht oder wurde verschoben.
         </p>
         <div className="mt-6">
           <Link
             to="/"
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className="inline-flex items-center justify-center bg-gold px-6 py-3 text-xs tracking-[0.25em] uppercase text-black transition-colors hover:bg-[var(--gold-soft)]"
           >
-            Go home
+            Zur Startseite
           </Link>
         </div>
       </div>
@@ -42,29 +42,27 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   }, [error]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+    <div className="flex min-h-screen items-center justify-center bg-black px-4">
       <div className="max-w-md text-center">
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">
-          This page didn't load
-        </h1>
+        <h1 className="font-display text-2xl text-foreground">Seite konnte nicht geladen werden</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Something went wrong on our end. You can try refreshing or head back home.
+          Es ist ein Fehler aufgetreten. Bitte laden Sie die Seite neu oder kehren Sie zur Startseite zurück.
         </p>
-        <div className="mt-6 flex flex-wrap justify-center gap-2">
+        <div className="mt-6 flex flex-wrap justify-center gap-3">
           <button
             onClick={() => {
               router.invalidate();
               reset();
             }}
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className="inline-flex items-center justify-center bg-gold px-6 py-3 text-xs tracking-[0.25em] uppercase text-black transition-colors hover:bg-[var(--gold-soft)]"
           >
-            Try again
+            Erneut versuchen
           </button>
           <a
             href="/"
-            className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
+            className="inline-flex items-center justify-center border border-[rgba(201,169,97,0.3)] px-6 py-3 text-xs tracking-[0.25em] uppercase text-foreground transition-colors hover:border-gold hover:text-gold"
           >
-            Go home
+            Zur Startseite
           </a>
         </div>
       </div>
@@ -83,22 +81,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:title", content: "Tiger Lounge – Premium Shisha Bar in Bürstadt" },
       { property: "og:description", content: "Tiger Lounge Bürstadt – Premium Shisha. Clean. Elegant. Unvergesslich." },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@Lovable" },
+      { property: "og:image", content: "/og-image.jpg" },
+      { property: "og:locale", content: "de_DE" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:site", content: "@tiger_lounge_" },
       { name: "twitter:title", content: "Tiger Lounge – Premium Shisha Bar in Bürstadt" },
       { name: "twitter:description", content: "Tiger Lounge Bürstadt – Premium Shisha. Clean. Elegant. Unvergesslich." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/a9dfb535-f026-4230-b55f-8d1d9051a0e5/id-preview-a9abe599--8ab7c081-3630-4602-bffc-c9f9138de517.lovable.app-1781924919338.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/a9dfb535-f026-4230-b55f-8d1d9051a0e5/id-preview-a9abe599--8ab7c081-3630-4602-bffc-c9f9138de517.lovable.app-1781924919338.png" },
+      { name: "twitter:image", content: "/og-image.jpg" },
     ],
     links: [
-      {
-        rel: "stylesheet",
-        href: appCss,
-      },
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Inter:wght@300;400;500;600&display=swap",
-      },
+      { rel: "stylesheet", href: appCss },
+      { rel: "icon", href: "/favicon.png", type: "image/png" },
+      { rel: "apple-touch-icon", href: "/favicon.png" },
     ],
   }),
   shellComponent: RootShell,
@@ -126,7 +120,6 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
     </QueryClientProvider>
   );

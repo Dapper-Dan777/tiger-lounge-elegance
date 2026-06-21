@@ -10,6 +10,8 @@ import { Label } from "@/components/ui/label";
 import { Calendar } from "@/components/ui/calendar";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
+import { CONTACT, getLocalBusinessSchema } from "@/lib/contact";
+import { PrivacyModal } from "@/components/privacy-modal";
 import logo from "@/assets/logo.png";
 import hero1 from "@/assets/hero-1.jpg";
 import hero2 from "@/assets/hero-2.jpg";
@@ -18,30 +20,6 @@ import hero4 from "@/assets/hero-4.jpg";
 import hero5 from "@/assets/hero-5.jpg";
 import hero6 from "@/assets/hero-6.jpg";
 
-const CONTACT = {
-  phone: "0176 22228134",
-  phoneTel: "tel:+4917622228134",
-  website: "https://tiger-lounge.eatbu.com/",
-  instagram: "https://www.instagram.com/tiger_lounge_",
-  instagramDm: "https://ig.me/m/tiger_lounge_",
-  instagramHandle: "tiger_lounge_",
-  owner: "Tiger Lounge",
-  address: {
-    street: "Mittelriedstraße 27",
-    zip: "68642",
-    city: "Bürstadt",
-    label: "Mittelriedstraße 27, 68642 Bürstadt",
-  },
-  maps: {
-    search:
-      "https://www.google.com/maps/search/?api=1&query=Mittelriedstra%C3%9Fe+27%2C+68642+B%C3%BCrstadt",
-    directions:
-      "https://www.google.com/maps/dir/?api=1&destination=Mittelriedstra%C3%9Fe+27%2C+68642+B%C3%BCrstadt&travelmode=driving",
-    embed:
-      "https://maps.google.com/maps?q=Mittelriedstra%C3%9Fe+27%2C+68642+B%C3%BCrstadt&hl=de&z=16&output=embed",
-  },
-} as const;
-
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
@@ -49,6 +27,12 @@ export const Route = createFileRoute("/")({
       { name: "description", content: "Tiger Lounge Bürstadt: Premium Shisha, edle Drinks und eine elegante Lounge-Atmosphäre. Reservieren Sie Ihren Tisch." },
       { property: "og:title", content: "Tiger Lounge – Bürstadt" },
       { property: "og:description", content: "Premium Shisha. Clean. Elegant. Unvergesslich." },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify(getLocalBusinessSchema()),
+      },
     ],
   }),
   component: Home,
@@ -178,6 +162,7 @@ function Home() {
   const [navOpen, setNavOpen] = useState(false);
   const [reserveOpen, setReserveOpen] = useState(false);
   const [imprintOpen, setImprintOpen] = useState(false);
+  const [privacyOpen, setPrivacyOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -212,6 +197,7 @@ function Home() {
           <div className="hidden md:flex items-center gap-10">
             <button onClick={() => scrollTo("hours")} className="text-sm tracking-[0.18em] uppercase text-foreground/80 hover:text-gold transition-colors">Öffnungszeiten</button>
             <button onClick={() => scrollTo("menu")} className="text-sm tracking-[0.18em] uppercase text-foreground/80 hover:text-gold transition-colors">Speisekarte</button>
+            <button onClick={() => scrollTo("gallery")} className="text-sm tracking-[0.18em] uppercase text-foreground/80 hover:text-gold transition-colors">Galerie</button>
             <button onClick={() => scrollTo("contact")} className="text-sm tracking-[0.18em] uppercase text-foreground/80 hover:text-gold transition-colors">Kontakt</button>
             <a href={CONTACT.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="text-foreground/80 hover:text-gold transition-colors">
               <Instagram className="h-5 w-5" />
@@ -234,6 +220,7 @@ function Home() {
             <div className="px-6 py-8 flex flex-col gap-6 text-center">
               <button onClick={() => scrollTo("hours")} className="text-sm tracking-[0.2em] uppercase">Öffnungszeiten</button>
               <button onClick={() => scrollTo("menu")} className="text-sm tracking-[0.2em] uppercase">Speisekarte</button>
+              <button onClick={() => scrollTo("gallery")} className="text-sm tracking-[0.2em] uppercase">Galerie</button>
               <button onClick={() => scrollTo("contact")} className="text-sm tracking-[0.2em] uppercase">Kontakt</button>
               <button onClick={() => { setNavOpen(false); setReserveOpen(true); }} className="border border-gold text-gold py-3 text-xs tracking-[0.22em] uppercase">Reservieren</button>
               <a href={CONTACT.instagram} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 text-gold text-sm">
@@ -252,7 +239,13 @@ function Home() {
             className="absolute inset-0 transition-opacity duration-[1800ms] ease-in-out"
             style={{ opacity: slide === i ? 1 : 0 }}
           >
-            <img src={img} alt="" className="w-full h-full object-cover" />
+            <img
+              src={img}
+              alt={`Tiger Lounge Atmosphäre ${i + 1}`}
+              className="w-full h-full object-cover"
+              loading={i === 0 ? "eager" : "lazy"}
+              fetchPriority={i === 0 ? "high" : "low"}
+            />
             <div className="absolute inset-0 bg-black/55" />
             <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black" />
           </div>
@@ -265,6 +258,9 @@ function Home() {
           <div className="hairline w-32 my-10" />
           <p className="text-sm md:text-base tracking-[0.25em] uppercase text-foreground/70 max-w-xl">
             Premium Shisha. Clean. Elegant. Unvergesslich.
+          </p>
+          <p className="mt-4 text-[10px] tracking-[0.35em] uppercase text-muted-foreground">
+            Eintritt ab 18 Jahren
           </p>
           <div className="flex flex-col sm:flex-row gap-4 mt-12">
             <button
@@ -407,6 +403,26 @@ function Home() {
         </Tabs>
       </section>
 
+      {/* Galerie */}
+      <section id="gallery" className="py-32 px-6 lg:px-12 border-t border-[rgba(201,169,97,0.12)]">
+        <SectionHeader kicker="Atmosphäre" title="Galerie" />
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3 mt-16 max-w-6xl mx-auto">
+          {heroImages.map((img, i) => (
+            <div
+              key={i}
+              className="overflow-hidden border border-[rgba(201,169,97,0.12)] aspect-[4/3] group"
+            >
+              <img
+                src={img}
+                alt={`Tiger Lounge Impression ${i + 1}`}
+                loading="lazy"
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+              />
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* Contact / Footer */}
       <section id="contact" className="py-32 px-6 lg:px-12 border-t border-[rgba(201,169,97,0.12)]">
         <div className="max-w-3xl mx-auto text-center">
@@ -455,16 +471,19 @@ function Home() {
             </a>
           </div>
 
-          <button
-            onClick={() => setImprintOpen(true)}
-            className="mt-16 text-[11px] tracking-[0.3em] uppercase text-muted-foreground hover:text-gold transition-colors"
-          >
-            Impressum
-          </button>
+          <div className="mt-16 flex items-center justify-center gap-4 text-[11px] tracking-[0.3em] uppercase text-muted-foreground">
+            <button onClick={() => setImprintOpen(true)} className="hover:text-gold transition-colors">
+              Impressum
+            </button>
+            <span className="text-[rgba(201,169,97,0.3)]">·</span>
+            <button onClick={() => setPrivacyOpen(true)} className="hover:text-gold transition-colors">
+              Datenschutz
+            </button>
+          </div>
         </div>
 
         <div className="max-w-7xl mx-auto mt-24 pt-8 border-t border-[rgba(201,169,97,0.08)] flex flex-col md:flex-row items-center justify-between gap-4 text-[11px] tracking-[0.2em] uppercase text-muted-foreground">
-          <span>© {new Date().getFullYear()} Tiger Lounge</span>
+          <span>© {new Date().getFullYear()} Tiger Lounge · Eintritt ab 18 Jahren</span>
           <a href={CONTACT.instagram} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-gold">
             <Instagram className="h-3.5 w-3.5" /> @{CONTACT.instagramHandle}
           </a>
@@ -473,6 +492,7 @@ function Home() {
 
       <ReserveModal open={reserveOpen} onOpenChange={setReserveOpen} />
       <ImprintModal open={imprintOpen} onOpenChange={setImprintOpen} />
+      <PrivacyModal open={privacyOpen} onOpenChange={setPrivacyOpen} />
     </div>
   );
 }
