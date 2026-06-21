@@ -1,11 +1,25 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { format } from "date-fns";
+import { de } from "date-fns/locale";
 import { Instagram, MapPin, Menu, X } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Calendar } from "@/components/ui/calendar";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { cn } from "@/lib/utils";
+
+const CONTACT = {
+  phone: "0176 22228134",
+  phoneTel: "tel:+4917622228134",
+  website: "https://tiger-lounge.eatbu.com/",
+  instagram: "https://www.instagram.com/tiger_lounge_",
+  instagramDm: "https://ig.me/m/tiger_lounge_",
+  instagramHandle: "tiger_lounge_",
+  owner: "Tiger Lounge",
+} as const;
 import logo from "@/assets/logo.png";
 import hero1 from "@/assets/hero-1.jpg";
 import hero2 from "@/assets/hero-2.jpg";
@@ -185,7 +199,7 @@ function Home() {
             <button onClick={() => scrollTo("hours")} className="text-sm tracking-[0.18em] uppercase text-foreground/80 hover:text-gold transition-colors">Öffnungszeiten</button>
             <button onClick={() => scrollTo("menu")} className="text-sm tracking-[0.18em] uppercase text-foreground/80 hover:text-gold transition-colors">Speisekarte</button>
             <button onClick={() => scrollTo("contact")} className="text-sm tracking-[0.18em] uppercase text-foreground/80 hover:text-gold transition-colors">Kontakt</button>
-            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="text-foreground/80 hover:text-gold transition-colors">
+            <a href={CONTACT.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="text-foreground/80 hover:text-gold transition-colors">
               <Instagram className="h-5 w-5" />
             </a>
             <button
@@ -208,8 +222,8 @@ function Home() {
               <button onClick={() => scrollTo("menu")} className="text-sm tracking-[0.2em] uppercase">Speisekarte</button>
               <button onClick={() => scrollTo("contact")} className="text-sm tracking-[0.2em] uppercase">Kontakt</button>
               <button onClick={() => { setNavOpen(false); setReserveOpen(true); }} className="border border-gold text-gold py-3 text-xs tracking-[0.22em] uppercase">Reservieren</button>
-              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 text-gold text-sm">
-                <Instagram className="h-4 w-4" /> Instagram
+              <a href={CONTACT.instagram} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 text-gold text-sm">
+                <Instagram className="h-4 w-4" /> @{CONTACT.instagramHandle}
               </a>
             </div>
           </div>
@@ -413,14 +427,14 @@ function Home() {
             onClick={() => setImprintOpen(true)}
             className="mt-16 text-[11px] tracking-[0.3em] uppercase text-muted-foreground hover:text-gold transition-colors"
           >
-            Impressum & Adresse
+            Impressum
           </button>
         </div>
 
         <div className="max-w-7xl mx-auto mt-24 pt-8 border-t border-[rgba(201,169,97,0.08)] flex flex-col md:flex-row items-center justify-between gap-4 text-[11px] tracking-[0.2em] uppercase text-muted-foreground">
           <span>© {new Date().getFullYear()} Tiger Lounge</span>
-          <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-gold">
-            <Instagram className="h-3.5 w-3.5" /> @tigerlounge
+          <a href={CONTACT.instagram} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-gold">
+            <Instagram className="h-3.5 w-3.5" /> @{CONTACT.instagramHandle}
           </a>
         </div>
       </section>
@@ -464,49 +478,198 @@ function MenuRow({ name, desc, price }: { name: string; desc?: string; price: st
 }
 
 function ReserveModal({ open, onOpenChange }: { open: boolean; onOpenChange: (b: boolean) => void }) {
-  const [submitted, setSubmitted] = useState(false);
+  const [date, setDate] = useState<Date | undefined>();
+  const [timeFrom, setTimeFrom] = useState("20:00");
+  const [timeTo, setTimeTo] = useState("22:00");
+  const [guests, setGuests] = useState(2);
+  const [error, setError] = useState("");
+  const [reservationMessage, setReservationMessage] = useState("");
+  const [copied, setCopied] = useState(false);
+
+  const reset = () => {
+    setDate(undefined);
+    setTimeFrom("20:00");
+    setTimeTo("22:00");
+    setGuests(2);
+    setError("");
+    setReservationMessage("");
+    setCopied(false);
+  };
+
+  const buildMessage = () => {
+    if (!date) return "";
+    const dateLabel = format(date, "EEEE, d. MMMM yyyy", { locale: de });
+    const guestsPart = guests > 1 ? ` für ${guests} Personen` : "";
+    return `Hallo! Kann ich einen Tisch am ${dateLabel} von ${timeFrom} bis ${timeTo} Uhr${guestsPart} reservieren? Vielen Dank!`;
+  };
+
+  const handleReserve = async () => {
+    setError("");
+    if (!date) {
+      setError("Bitte wählen Sie ein Datum aus.");
+      return;
+    }
+    if (!timeFrom || !timeTo) {
+      setError("Bitte geben Sie eine Uhrzeit von und bis an.");
+      return;
+    }
+    if (timeTo <= timeFrom) {
+      setError("Die Endzeit muss nach der Startzeit liegen.");
+      return;
+    }
+
+    const message = buildMessage();
+    setReservationMessage(message);
+
+    try {
+      await navigator.clipboard.writeText(message);
+      setCopied(true);
+    } catch {
+      setCopied(false);
+    }
+
+    window.open(CONTACT.instagramDm, "_blank", "noopener,noreferrer");
+  };
+
   return (
-    <Dialog open={open} onOpenChange={(v) => { onOpenChange(v); if (!v) setSubmitted(false); }}>
-      <DialogContent className="bg-black border border-[rgba(201,169,97,0.3)] sm:max-w-md p-10">
+    <Dialog
+      open={open}
+      onOpenChange={(v) => {
+        onOpenChange(v);
+        if (!v) reset();
+      }}
+    >
+      <DialogContent className="bg-black border border-[rgba(201,169,97,0.3)] sm:max-w-lg p-8 max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <div className="text-gold text-[10px] tracking-[0.5em] uppercase mb-3 text-center">Reservierung</div>
           <DialogTitle className="font-display text-3xl text-center tracking-wide">Tisch reservieren</DialogTitle>
           <DialogDescription className="text-center text-muted-foreground text-sm">
-            Wir bestätigen Ihre Anfrage in Kürze.
+            Datum und Uhrzeit wählen — wir leiten Sie mit einer fertigen Nachricht zu Instagram weiter.
           </DialogDescription>
         </DialogHeader>
-        {submitted ? (
-          <div className="py-8 text-center">
-            <div className="hairline w-12 mx-auto mb-6" />
-            <p className="text-foreground">Vielen Dank.</p>
-            <p className="text-muted-foreground text-sm mt-2">Ihre Anfrage wurde übermittelt.</p>
+
+        {reservationMessage ? (
+          <div className="py-4 text-center space-y-4">
+            <div className="hairline w-12 mx-auto" />
+            <p className="text-foreground text-sm">Instagram wird geöffnet.</p>
+            <p className="text-muted-foreground text-sm">
+              {copied
+                ? "Die Reservierungsnachricht wurde kopiert — einfach in den Chat einfügen und absenden."
+                : "Kopieren Sie die Nachricht unten und senden Sie sie im Instagram-Chat."}
+            </p>
+            <p className="text-left text-sm text-foreground/90 bg-[rgba(201,169,97,0.08)] border border-[rgba(201,169,97,0.15)] p-4 leading-relaxed">
+              {reservationMessage}
+            </p>
+            <div className="flex flex-col gap-3">
+              <Button
+                type="button"
+                onClick={() => void navigator.clipboard.writeText(reservationMessage)}
+                className="w-full bg-gold text-black hover:bg-[var(--gold-soft)] rounded-none py-5 text-xs tracking-[0.25em] uppercase"
+              >
+                Nachricht kopieren
+              </Button>
+              <a
+                href={CONTACT.instagramDm}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 border border-gold text-gold py-4 text-xs tracking-[0.25em] uppercase hover:bg-gold hover:text-black transition-all"
+              >
+                <Instagram className="h-4 w-4" /> Instagram-Chat öffnen
+              </a>
+            </div>
           </div>
         ) : (
-          <form
-            onSubmit={(e) => { e.preventDefault(); setSubmitted(true); }}
-            className="space-y-4 mt-4"
-          >
-            <Field id="name" label="Name"><Input id="name" required className="bg-transparent border-0 border-b border-[rgba(201,169,97,0.25)] rounded-none px-0 focus-visible:ring-0 focus-visible:border-gold" /></Field>
-            <Field id="email" label="E-Mail"><Input id="email" type="email" required className="bg-transparent border-0 border-b border-[rgba(201,169,97,0.25)] rounded-none px-0 focus-visible:ring-0 focus-visible:border-gold" /></Field>
-            <div className="grid grid-cols-2 gap-4">
-              <Field id="date" label="Datum"><Input id="date" type="date" required className="bg-transparent border-0 border-b border-[rgba(201,169,97,0.25)] rounded-none px-0 focus-visible:ring-0 focus-visible:border-gold" /></Field>
-              <Field id="time" label="Uhrzeit"><Input id="time" type="time" required className="bg-transparent border-0 border-b border-[rgba(201,169,97,0.25)] rounded-none px-0 focus-visible:ring-0 focus-visible:border-gold" /></Field>
+          <div className="space-y-6 mt-4">
+            <div className="flex justify-center">
+              <Calendar
+                mode="single"
+                selected={date}
+                onSelect={setDate}
+                locale={de}
+                disabled={(day) => day < new Date(new Date().setHours(0, 0, 0, 0))}
+                className="rounded-none border border-[rgba(201,169,97,0.15)] bg-black p-2"
+                classNames={{
+                  today: "bg-[rgba(201,169,97,0.12)] text-gold",
+                  selected:
+                    "bg-gold text-black hover:bg-gold hover:text-black focus:bg-gold focus:text-black",
+                  day: "text-foreground hover:bg-[rgba(201,169,97,0.12)]",
+                  day_button: cn(
+                    "hover:bg-[rgba(201,169,97,0.12)]",
+                    "data-[selected-single=true]:bg-gold data-[selected-single=true]:text-black",
+                  ),
+                  caption_label: "text-foreground font-display text-lg",
+                  weekday: "text-muted-foreground text-[10px] tracking-[0.2em] uppercase",
+                  outside: "text-muted-foreground/40",
+                  disabled: "text-muted-foreground/30",
+                }}
+              />
             </div>
-            <Field id="guests" label="Personen"><Input id="guests" type="number" min={1} max={20} defaultValue={2} required className="bg-transparent border-0 border-b border-[rgba(201,169,97,0.25)] rounded-none px-0 focus-visible:ring-0 focus-visible:border-gold" /></Field>
-            <Button type="submit" className="w-full bg-gold text-black hover:bg-[var(--gold-soft)] rounded-none py-6 text-xs tracking-[0.25em] uppercase mt-8">
-              Reservierung senden
+
+            <div className="grid grid-cols-2 gap-4">
+              <ReserveField id="time-from" label="Von">
+                <Input
+                  id="time-from"
+                  type="time"
+                  value={timeFrom}
+                  onChange={(e) => setTimeFrom(e.target.value)}
+                  required
+                  className="bg-transparent border-0 border-b border-[rgba(201,169,97,0.25)] rounded-none px-0 focus-visible:ring-0 focus-visible:border-gold"
+                />
+              </ReserveField>
+              <ReserveField id="time-to" label="Bis">
+                <Input
+                  id="time-to"
+                  type="time"
+                  value={timeTo}
+                  onChange={(e) => setTimeTo(e.target.value)}
+                  required
+                  className="bg-transparent border-0 border-b border-[rgba(201,169,97,0.25)] rounded-none px-0 focus-visible:ring-0 focus-visible:border-gold"
+                />
+              </ReserveField>
+            </div>
+
+            <ReserveField id="guests" label="Personen">
+              <Input
+                id="guests"
+                type="number"
+                min={1}
+                max={20}
+                value={guests}
+                onChange={(e) => setGuests(Number(e.target.value))}
+                required
+                className="bg-transparent border-0 border-b border-[rgba(201,169,97,0.25)] rounded-none px-0 focus-visible:ring-0 focus-visible:border-gold"
+              />
+            </ReserveField>
+
+            {date && (
+              <p className="text-xs text-muted-foreground text-center leading-relaxed">
+                „{buildMessage()}“
+              </p>
+            )}
+
+            {error && <p className="text-sm text-red-400 text-center">{error}</p>}
+
+            <Button
+              type="button"
+              onClick={() => void handleReserve()}
+              className="w-full bg-gold text-black hover:bg-[var(--gold-soft)] rounded-none py-6 text-xs tracking-[0.25em] uppercase"
+            >
+              <Instagram className="h-4 w-4 mr-2" />
+              Über Instagram reservieren
             </Button>
-          </form>
+          </div>
         )}
       </DialogContent>
     </Dialog>
   );
 }
 
-function Field({ id, label, children }: { id: string; label: string; children: React.ReactNode }) {
+function ReserveField({ id, label, children }: { id: string; label: string; children: React.ReactNode }) {
   return (
     <div>
-      <Label htmlFor={id} className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground">{label}</Label>
+      <Label htmlFor={id} className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground">
+        {label}
+      </Label>
       <div className="mt-1">{children}</div>
     </div>
   );
@@ -515,39 +678,38 @@ function Field({ id, label, children }: { id: string; label: string; children: R
 function ImprintModal({ open, onOpenChange }: { open: boolean; onOpenChange: (b: boolean) => void }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-black border border-[rgba(201,169,97,0.3)] sm:max-w-lg p-10">
+      <DialogContent className="bg-black border border-[rgba(201,169,97,0.3)] sm:max-w-md p-10">
         <DialogHeader>
           <div className="text-gold text-[10px] tracking-[0.5em] uppercase mb-3 text-center">Information</div>
-          <DialogTitle className="font-display text-3xl text-center tracking-wide">Impressum & Adresse</DialogTitle>
+          <DialogTitle className="font-display text-3xl text-center tracking-wide">Impressum</DialogTitle>
         </DialogHeader>
-        <div className="space-y-6 mt-6 text-sm">
-          <Block title="Adresse">
-            Tiger Lounge<br />
+        <div className="space-y-5 mt-6 text-sm text-center">
+          <p className="font-display text-2xl text-foreground">{CONTACT.owner}</p>
+          <p className="text-foreground/85 leading-relaxed">
             Mittelriedstraße 27<br />
             68642 Bürstadt
-          </Block>
-          <Block title="Kontakt">
-            Telefon: +49 (0) 6851 000 000<br />
-            E-Mail: hallo@tigerlounge.de
-          </Block>
-          <Block title="Inhaber">
-            Max Mustermann<br />
-            USt-IdNr.: DE000000000
-          </Block>
-          <p className="text-xs text-muted-foreground/70 leading-relaxed pt-4 border-t border-[rgba(201,169,97,0.1)]">
-            Platzhalter — bitte mit den tatsächlichen Angaben gemäß § 5 TMG ersetzen.
           </p>
+          <p className="text-foreground/85 leading-relaxed">
+            <a href={CONTACT.phoneTel} className="hover:text-gold transition-colors">
+              {CONTACT.phone}
+            </a>
+            <br />
+            <a href={CONTACT.website} target="_blank" rel="noopener noreferrer" className="hover:text-gold transition-colors">
+              tiger-lounge.eatbu.com
+            </a>
+          </p>
+          <a
+            href={CONTACT.instagram}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center gap-2 text-gold text-xs tracking-[0.2em] uppercase hover:text-[var(--gold-soft)] transition-colors"
+          >
+            <Instagram className="h-4 w-4" /> @{CONTACT.instagramHandle}
+          </a>
         </div>
       </DialogContent>
     </Dialog>
   );
 }
 
-function Block({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div>
-      <div className="text-[10px] tracking-[0.3em] uppercase text-gold mb-2">{title}</div>
-      <div className="text-foreground/85 leading-relaxed">{children}</div>
-    </div>
-  );
-}
+
