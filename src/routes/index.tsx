@@ -17,9 +17,9 @@ import hero6 from "@/assets/hero-6.jpg";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Tiger Lounge – Premium Shisha Bar in Sankt Wendel" },
-      { name: "description", content: "Tiger Lounge Sankt Wendel: Premium Shisha, edle Drinks und eine elegante Lounge-Atmosphäre. Reservieren Sie Ihren Tisch." },
-      { property: "og:title", content: "Tiger Lounge – Sankt Wendel" },
+      { title: "Tiger Lounge – Premium Shisha Bar in Bürstadt" },
+      { name: "description", content: "Tiger Lounge Bürstadt: Premium Shisha, edle Drinks und eine elegante Lounge-Atmosphäre. Reservieren Sie Ihren Tisch." },
+      { property: "og:title", content: "Tiger Lounge – Bürstadt" },
       { property: "og:description", content: "Premium Shisha. Clean. Elegant. Unvergesslich." },
     ],
   }),
@@ -384,17 +384,17 @@ function Home() {
         <div className="max-w-3xl mx-auto text-center">
           <div className="text-gold text-[10px] tracking-[0.6em] uppercase mb-6">Besuchen Sie uns</div>
           <h2 className="font-display text-5xl md:text-6xl tracking-wide">
-            Tiger Lounge<span className="text-gold mx-3">·</span>Sankt Wendel
+            Tiger Lounge<span className="text-gold mx-3">·</span>Bürstadt
           </h2>
           <div className="hairline w-24 mx-auto my-10" />
           <p className="text-muted-foreground max-w-md mx-auto leading-relaxed">
             Wir freuen uns auf Ihren Besuch. Reservieren Sie vorab Ihren Tisch oder finden Sie uns
-            ganz einfach im Herzen von Sankt Wendel.
+            in der Mittelriedstraße 27 in Bürstadt.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mt-12">
             <a
-              href="https://maps.google.com/?q=Sankt+Wendel"
+              href="https://www.google.com/maps/search/?api=1&query=Mittelriedstra%C3%9Fe+27%2C+68642+B%C3%BCrstadt"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2 border border-[rgba(255,255,255,0.2)] px-8 py-4 text-xs tracking-[0.25em] uppercase hover:border-gold hover:text-gold transition-all"
@@ -523,8 +523,8 @@ function ImprintModal({ open, onOpenChange }: { open: boolean; onOpenChange: (b:
         <div className="space-y-6 mt-6 text-sm">
           <Block title="Adresse">
             Tiger Lounge<br />
-            Musterstraße 12<br />
-            66606 Sankt Wendel
+            Mittelriedstraße 27<br />
+            68642 Bürstadt
           </Block>
           <Block title="Kontakt">
             Telefon: +49 (0) 6851 000 000<br />

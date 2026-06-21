@@ -77,16 +77,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Tiger Lounge – Premium Shisha Bar in Sankt Wendel" },
-      { name: "description", content: "Tiger Lounge Sankt Wendel – Premium Shisha. Clean. Elegant. Unvergesslich." },
+      { title: "Tiger Lounge – Premium Shisha Bar in Bürstadt" },
+      { name: "description", content: "Tiger Lounge Bürstadt – Premium Shisha. Clean. Elegant. Unvergesslich." },
       { name: "author", content: "Tiger Lounge" },
-      { property: "og:title", content: "Tiger Lounge – Premium Shisha Bar in Sankt Wendel" },
-      { property: "og:description", content: "Tiger Lounge Sankt Wendel – Premium Shisha. Clean. Elegant. Unvergesslich." },
+      { property: "og:title", content: "Tiger Lounge – Premium Shisha Bar in Bürstadt" },
+      { property: "og:description", content: "Tiger Lounge Bürstadt – Premium Shisha. Clean. Elegant. Unvergesslich." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
-      { name: "twitter:title", content: "Tiger Lounge – Premium Shisha Bar in Sankt Wendel" },
-      { name: "twitter:description", content: "Tiger Lounge Sankt Wendel – Premium Shisha. Clean. Elegant. Unvergesslich." },
+      { name: "twitter:title", content: "Tiger Lounge – Premium Shisha Bar in Bürstadt" },
+      { name: "twitter:description", content: "Tiger Lounge Bürstadt – Premium Shisha. Clean. Elegant. Unvergesslich." },
       { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/a9dfb535-f026-4230-b55f-8d1d9051a0e5/id-preview-a9abe599--8ab7c081-3630-4602-bffc-c9f9138de517.lovable.app-1781924919338.png" },
       { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/a9dfb535-f026-4230-b55f-8d1d9051a0e5/id-preview-a9abe599--8ab7c081-3630-4602-bffc-c9f9138de517.lovable.app-1781924919338.png" },
     ],
@@ -109,7 +109,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="de">
       <head>
         <HeadContent />
       </head>
