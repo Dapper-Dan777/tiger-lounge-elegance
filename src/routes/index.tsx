@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { format } from "date-fns";
 import { de } from "date-fns/locale";
-import { Instagram, MapPin, Menu, X } from "lucide-react";
+import { Instagram, MapPin, Menu, Navigation, X } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +10,13 @@ import { Label } from "@/components/ui/label";
 import { Calendar } from "@/components/ui/calendar";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
+import logo from "@/assets/logo.png";
+import hero1 from "@/assets/hero-1.jpg";
+import hero2 from "@/assets/hero-2.jpg";
+import hero3 from "@/assets/hero-3.jpg";
+import hero4 from "@/assets/hero-4.jpg";
+import hero5 from "@/assets/hero-5.jpg";
+import hero6 from "@/assets/hero-6.jpg";
 
 const CONTACT = {
   phone: "0176 22228134",
@@ -19,14 +26,21 @@ const CONTACT = {
   instagramDm: "https://ig.me/m/tiger_lounge_",
   instagramHandle: "tiger_lounge_",
   owner: "Tiger Lounge",
+  address: {
+    street: "Mittelriedstraße 27",
+    zip: "68642",
+    city: "Bürstadt",
+    label: "Mittelriedstraße 27, 68642 Bürstadt",
+  },
+  maps: {
+    search:
+      "https://www.google.com/maps/search/?api=1&query=Mittelriedstra%C3%9Fe+27%2C+68642+B%C3%BCrstadt",
+    directions:
+      "https://www.google.com/maps/dir/?api=1&destination=Mittelriedstra%C3%9Fe+27%2C+68642+B%C3%BCrstadt&travelmode=driving",
+    embed:
+      "https://maps.google.com/maps?q=Mittelriedstra%C3%9Fe+27%2C+68642+B%C3%BCrstadt&hl=de&z=16&output=embed",
+  },
 } as const;
-import logo from "@/assets/logo.png";
-import hero1 from "@/assets/hero-1.jpg";
-import hero2 from "@/assets/hero-2.jpg";
-import hero3 from "@/assets/hero-3.jpg";
-import hero4 from "@/assets/hero-4.jpg";
-import hero5 from "@/assets/hero-5.jpg";
-import hero6 from "@/assets/hero-6.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -408,7 +422,7 @@ function Home() {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mt-12">
             <a
-              href="https://www.google.com/maps/search/?api=1&query=Mittelriedstra%C3%9Fe+27%2C+68642+B%C3%BCrstadt"
+              href={CONTACT.maps.search}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2 border border-[rgba(255,255,255,0.2)] px-8 py-4 text-xs tracking-[0.25em] uppercase hover:border-gold hover:text-gold transition-all"
@@ -678,7 +692,7 @@ function ReserveField({ id, label, children }: { id: string; label: string; chil
 function ImprintModal({ open, onOpenChange }: { open: boolean; onOpenChange: (b: boolean) => void }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-black border border-[rgba(201,169,97,0.3)] sm:max-w-md p-10">
+      <DialogContent className="bg-black border border-[rgba(201,169,97,0.3)] sm:max-w-lg p-8 max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <div className="text-gold text-[10px] tracking-[0.5em] uppercase mb-3 text-center">Information</div>
           <DialogTitle className="font-display text-3xl text-center tracking-wide">Impressum</DialogTitle>
@@ -686,9 +700,33 @@ function ImprintModal({ open, onOpenChange }: { open: boolean; onOpenChange: (b:
         <div className="space-y-5 mt-6 text-sm text-center">
           <p className="font-display text-2xl text-foreground">{CONTACT.owner}</p>
           <p className="text-foreground/85 leading-relaxed">
-            Mittelriedstraße 27<br />
-            68642 Bürstadt
+            {CONTACT.address.street}
+            <br />
+            {CONTACT.address.zip} {CONTACT.address.city}
           </p>
+
+          <div className="space-y-3 text-left">
+            <div className="overflow-hidden border border-[rgba(201,169,97,0.2)]">
+              <iframe
+                title="Tiger Lounge auf Google Maps"
+                src={CONTACT.maps.embed}
+                className="w-full h-52 border-0 grayscale-[20%] contrast-[1.05]"
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                allowFullScreen
+              />
+            </div>
+            <a
+              href={CONTACT.maps.directions}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 w-full bg-gold text-black py-4 text-xs tracking-[0.25em] uppercase hover:bg-[var(--gold-soft)] transition-all"
+            >
+              <Navigation className="h-4 w-4" />
+              Route in Google Maps
+            </a>
+          </div>
+
           <p className="text-foreground/85 leading-relaxed">
             <a href={CONTACT.phoneTel} className="hover:text-gold transition-colors">
               {CONTACT.phone}
