@@ -70,6 +70,12 @@ export function getLocalBusinessSchema(siteOrigin = "") {
         closes: "01:00",
       },
     ],
+    aggregateRating: {
+      "@type": "AggregateRating",
+      ratingValue: 4.8,
+      reviewCount: 50,
+      bestRating: 5,
+    },
     sameAs: [CONTACT.instagram, CONTACT.website],
   };
 }

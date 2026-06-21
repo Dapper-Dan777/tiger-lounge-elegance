@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { format } from "date-fns";
 import { de } from "date-fns/locale";
-import { Instagram, MapPin, Menu, Navigation, X } from "lucide-react";
+import { Instagram, MapPin, Menu, Navigation, Star, X } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,7 +11,16 @@ import { Calendar } from "@/components/ui/calendar";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import { CONTACT, getLocalBusinessSchema } from "@/lib/contact";
+import { FIVE_STAR_REVIEWS, GOOGLE_REVIEWS } from "@/lib/reviews";
 import { PrivacyModal } from "@/components/privacy-modal";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+  type CarouselApi,
+} from "@/components/ui/carousel";
 import logo from "@/assets/logo.png";
 import hero1 from "@/assets/hero-1.jpg";
 import hero2 from "@/assets/hero-2.jpg";
@@ -423,6 +432,37 @@ function Home() {
         </div>
       </section>
 
+      {/* Bewertungen */}
+      <section id="reviews" className="py-32 px-6 lg:px-12 border-t border-[rgba(201,169,97,0.12)]">
+        <SectionHeader kicker="Stimmen" title="Bewertungen" />
+        <div className="max-w-6xl mx-auto mt-16">
+          <div className="text-center mb-14">
+            <div className="flex items-center justify-center gap-1 mb-4">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Star key={i} className="h-5 w-5 fill-gold text-gold" />
+              ))}
+            </div>
+            <p className="font-display text-4xl text-gold">{GOOGLE_REVIEWS.rating}</p>
+            <p className="text-xs tracking-[0.25em] uppercase text-muted-foreground mt-3">
+              {GOOGLE_REVIEWS.count} Google-Bewertungen
+            </p>
+          </div>
+
+          <ReviewsCarousel />
+
+          <div className="flex justify-center mt-12">
+            <a
+              href={GOOGLE_REVIEWS.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="border border-gold text-gold px-8 py-4 text-xs tracking-[0.25em] uppercase hover:bg-gold hover:text-black transition-all"
+            >
+              Alle Bewertungen auf Google
+            </a>
+          </div>
+        </div>
+      </section>
+
       {/* Contact / Footer */}
       <section id="contact" className="py-32 px-6 lg:px-12 border-t border-[rgba(201,169,97,0.12)]">
         <div className="max-w-3xl mx-auto text-center">
@@ -493,6 +533,80 @@ function Home() {
       <ReserveModal open={reserveOpen} onOpenChange={setReserveOpen} />
       <ImprintModal open={imprintOpen} onOpenChange={setImprintOpen} />
       <PrivacyModal open={privacyOpen} onOpenChange={setPrivacyOpen} />
+    </div>
+  );
+}
+
+function ReviewsCarousel() {
+  const [api, setApi] = useState<CarouselApi>();
+  const [current, setCurrent] = useState(0);
+  const [paused, setPaused] = useState(false);
+
+  useEffect(() => {
+    if (!api) return;
+    const onSelect = () => setCurrent(api.selectedScrollSnap());
+    onSelect();
+    api.on("select", onSelect);
+    return () => {
+      api.off("select", onSelect);
+    };
+  }, [api]);
+
+  useEffect(() => {
+    if (!api || paused) return;
+    const interval = setInterval(() => api.scrollNext(), 5000);
+    return () => clearInterval(interval);
+  }, [api, paused]);
+
+  return (
+    <div
+      className="relative max-w-2xl mx-auto"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      onFocusCapture={() => setPaused(true)}
+      onBlurCapture={() => setPaused(false)}
+    >
+      <Carousel opts={{ loop: true }} setApi={setApi} className="w-full">
+        <CarouselContent className="ml-0">
+          {FIVE_STAR_REVIEWS.map((review) => (
+            <CarouselItem key={`${review.author}-${review.date}`} className="pl-0">
+              <article className="border border-[rgba(201,169,97,0.15)] bg-black p-10 md:p-12 text-center min-h-[280px] flex flex-col justify-center">
+                <div className="flex items-center justify-center gap-1 mb-6">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Star key={i} className="h-4 w-4 fill-gold text-gold" />
+                  ))}
+                </div>
+                <p className="font-display text-xl md:text-2xl leading-relaxed text-foreground/90">
+                  „{review.text}"
+                </p>
+                <div className="mt-8 pt-6 border-t border-[rgba(201,169,97,0.12)]">
+                  <p className="text-xs tracking-[0.2em] uppercase text-gold">{review.author}</p>
+                  <p className="text-[11px] tracking-[0.15em] uppercase text-muted-foreground mt-1">
+                    {review.date} · Google
+                  </p>
+                </div>
+              </article>
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+        <CarouselPrevious className="left-0 md:-left-14 top-1/2 -translate-y-1/2 border-[rgba(201,169,97,0.3)] bg-black text-gold hover:bg-gold hover:text-black hover:border-gold" />
+        <CarouselNext className="right-0 md:-right-14 top-1/2 -translate-y-1/2 border-[rgba(201,169,97,0.3)] bg-black text-gold hover:bg-gold hover:text-black hover:border-gold" />
+      </Carousel>
+
+      <div className="flex justify-center gap-2 mt-8">
+        {FIVE_STAR_REVIEWS.map((review, i) => (
+          <button
+            key={`${review.author}-dot`}
+            type="button"
+            aria-label={`Bewertung ${i + 1}`}
+            onClick={() => api?.scrollTo(i)}
+            className={cn(
+              "h-1.5 rounded-full transition-all duration-500",
+              current === i ? "w-8 bg-gold" : "w-1.5 bg-[rgba(201,169,97,0.3)] hover:bg-[rgba(201,169,97,0.5)]",
+            )}
+          />
+        ))}
+      </div>
     </div>
   );
 }
